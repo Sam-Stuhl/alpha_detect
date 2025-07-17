@@ -1,3 +1,3 @@
 class PriceThreshold:
-    def __init__(self):
-        print('Price Threshold')
+    def __init__(self, ticker: str):
+        self.ticker = ticker

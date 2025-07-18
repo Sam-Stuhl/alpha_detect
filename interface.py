@@ -13,16 +13,22 @@ def interface():
     
     strategy_choice: str = list(strategies.keys())[int(input('Choose a Strategy: ')) - 1]
     
-    print()
     
     while True:
-        ticker_choice: str = input('Enter the stock name you would like to test on: ')
+        ticker_choice: str = input('\nEnter the stock name you would like to test on: ').upper()
         if is_valid_ticker(ticker_choice): 
             break 
         else:
             print(f'{ticker_choice} is not a stock. Please Enter a valid stock name (make sure to use the correct stock symbol)\n')
     
-    strategies[strategy_choice](ticker_choice)
+    
+    try:
+        starting_capital = float(input('\nEnter starting capital (enter for $1000): '))
+        
+        strategies[strategy_choice](ticker_choice, starting_capital)
+    except Exception:
+        strategies[strategy_choice](ticker_choice)
+        
     
 def is_valid_ticker(ticker: str) -> bool:
     try:

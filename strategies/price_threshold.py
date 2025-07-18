@@ -1,6 +1,7 @@
 from .strategy import Strategy
 
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 
 class PriceThreshold(Strategy):
@@ -28,7 +29,7 @@ class PriceThreshold(Strategy):
 
     def back_test(self) -> None:
         trade_history_df = pd.DataFrame(columns=['date', 'action', 'shares', 'price_per_share', 'total_price', 'total_val', 'trade_index'])
-        trade_history_df.loc[len(trade_history_df)] = [self.ticker_price_data_df['Date'][0], 'init', 0, 0, 0, self.capital, 0] # Initialize using starting capital (mostly needed for plotting)
+        trade_history_df.loc[len(trade_history_df)] = [self.ticker_price_data_df['Date'][0], 'START', np.nan, np.nan, np.nan, self.capital, np.nan] # Add starting capital
         
         buy_count = 0
         sell_count = 0
@@ -46,7 +47,6 @@ class PriceThreshold(Strategy):
                 cash -= shares * price
                 buy_count += shares
                 trade_history_df.loc[len(trade_history_df)] = [row['Date'], 'buy', shares, price, price * shares, cash, index]
-                #print(f"Bought at index {index} for {ticker_price}\nis_bought: {is_bought}\n") # Debug
                 
             # Sell Stock
             elif price >= self.sell_price and shares != 0:
@@ -54,36 +54,39 @@ class PriceThreshold(Strategy):
                 sell_count += shares
                 trade_history_df.loc[len(trade_history_df)] = [row['Date'], 'sell', shares, price, price * shares, cash, index]
                 shares = 0
-                #print(f"Sold at index {index} for {ticker_price}\nis_bought: {is_bought}\n") # Debug
                 
-        print(f"\nPrice Threshold ({self.ticker}) Back Test Results")
+                
+        # print(f"\nPrice Threshold ({self.ticker}) Back Test Results")
         
         # Liquidate remaining shares at final price
         final_price = self.ticker_price_data_df['Close'].iloc[-1]
         if shares > 0:
             cash += shares * final_price
-            print(f"   Liquidated {shares} shares at final price ${final_price:.2f}")
+            #print(f"   Liquidated {shares} shares at final price ${final_price:.2f}")
             shares = 0
             
-        print(f"   Starting Capital: ${self.capital}")
-        print(f"   End Capital: ${cash:.2f}")
-        print(f"   Net Profit: ${(cash - self.capital):.2f}")
-        print(f"   Percentage Return: {((cash - self.capital) / self.capital) * 100:.2f}%")
-        print(f"   Number of shares bought: {buy_count}")
-        print(f"   Number of times sold: {sell_count}")
+        # print(f"   Starting Capital: ${self.capital}")
+        # print(f"   End Capital: ${cash:.2f}")
+        # print(f"   Net Profit: ${(cash - self.capital):.2f}")
+        # print(f"   Percentage Return: {((cash - self.capital) / self.capital) * 100:.2f}%")
+        # print(f"   Number of shares bought: {buy_count}")
+        # print(f"   Number of times sold: {sell_count}")
+        
+        summary_text = (
+            f"Start Capital: ${self.capital:.2f}\n"
+            f"End Capital: ${cash:.2f}\n"
+            f"Net Profit: ${(cash - self.capital):.2f}\n"
+            f"Return: {((cash - self.capital) / self.capital) * 100:.2f}%\n"
+            f"Buys: {buy_count} | Sells: {sell_count}"
+        )
+        
+        trade_history_df.loc[len(trade_history_df)] = [self.ticker_price_data_df['Date'][len(self.ticker_price_data_df['Date']) - 1], 'END', np.nan, np.nan, np.nan, cash, np.nan] # Add ending capital
         
         print(f"\n{trade_history_df}")
         
-        self.plot_backtest_results(trade_history_df)
-    
-        # Debug
-        # for index in indexes_bought:
-        #     print(f"Bought at index {index} for {self.ticker_price_data_df.loc[index, 'Close']}")
-            
-        # for index in indexes_sold:
-        #     print(f"Sold at index {index} for {self.ticker_price_data_df.loc[index, 'Close']}")
+        self.plot_backtest_results(trade_history_df, summary_text)
         
-    def plot_backtest_results(self, trade_history_df: pd.DataFrame) -> None:
+    def plot_backtest_results(self, trade_history_df: pd.DataFrame, summary_text: str) -> None:
         # Get Strategy values
         strategy_dates = trade_history_df['date']
         strategy_values = trade_history_df['total_val']
@@ -125,6 +128,21 @@ class PriceThreshold(Strategy):
         
         plt.scatter(buys['date'], buys['price_per_share'], color='red', marker='^', label='Buy')
         plt.scatter(sells['date'], sells['price_per_share'], color='green', marker='v', label='Sell')
+        
+        # Add Summary
+        plt.text(
+            0.5, 0.98, summary_text,
+            transform=plt.gca().transAxes,
+            va='top',
+            ha='center',
+            multialignment='left',
+            fontsize=10,
+            bbox=dict(facecolor='white', alpha=0.8, boxstyle='round')
+        )
+        # fig.text(
+        #     0.01, -0.15, summary_text,
+        #     ha='left', va='top', fontsize=10, wrap=True
+        # )
         
         # Title and Legends
         plt.title(f'{self.ticker} Backtest: {self.type} Strategy vs. Buy & Hold')

@@ -15,7 +15,7 @@ def interface():
     
     
     while True:
-        ticker_choice: str = input('\nEnter the stock name you would like to test on: ').upper()
+        ticker_choice: str = input('\nEnter the stock symbol you would like to test on: ').upper()
         if is_valid_ticker(ticker_choice): 
             break 
         else:

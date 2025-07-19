@@ -1,5 +1,5 @@
-from interface import interface
+from interface import CLI
 
 if __name__ == '__main__':
-    interface()
+    CLI()
     

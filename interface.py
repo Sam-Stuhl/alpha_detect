@@ -1,20 +1,16 @@
-from strategies import PriceThreshold, RSIThreshold, SMACrossover
+from strategies import strategies
+
 import yfinance as yf
 
 class CLI:
     def __init__(self, strategy: str = None, ticker: str = None, capital: float = None, time_period: str = None):
-        self.strategies: dict[str: function] = {
-            'Price Threshold': PriceThreshold,
-            'RSI Threshold': RSIThreshold,
-            'SMA Crossover': SMACrossover
-            }
         self.strategy = self.get_strategy() if not strategy else strategy
         self.ticker = self.get_ticker() if not ticker else ticker
         self.starting_capital = self.get_capital() if not capital else capital
         self.time_period = self.get_time_period() if not time_period else time_period
         
         # Initialize Strategy   
-        self.strategies[self.strategy](self.ticker, self.starting_capital, self.time_period)
+        strategies[self.strategy](self.ticker, self.starting_capital, self.time_period)
     
     def get_strategy(self) -> str:
         for i, strategy in enumerate(self.strategies.keys()):

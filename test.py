@@ -9,15 +9,10 @@ if __name__ == "__main__":
     # buy = 20
     # sell = 25
     
-    # # AMD
-    # ticker = 'AMD'
-    # buy = 110
-    # sell = 145
-    
-    # Tesla
-    ticker = 'TSL'
-    buy = 15
-    sell = 16
+    # AMD
+    ticker = 'AMD'
+    buy = 110
+    sell = 145
     
     PriceThreshold(ticker, buy_price=buy, sell_price=sell)    
     

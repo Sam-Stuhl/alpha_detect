@@ -5,8 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class PriceThreshold(Strategy):
-    def __init__(self, ticker: str, capital: float = 1000.0, buy_price: int = None, sell_price: int = None):
-        super().__init__("Price Threshold", ticker, capital) # Gives access to type, ticker, and ticker_price_data_df
+    def __init__(self, ticker: str, capital: float, time_period: str, buy_price: int = None, sell_price: int = None):
+        super().__init__("Price Threshold", ticker, capital, time_period) # Gives access to type, ticker, and ticker_price_data_df
         
         if not(buy_price and sell_price):
             self.buy_price, self.sell_price = self.get_buy_and_sell()
@@ -114,7 +114,7 @@ class PriceThreshold(Strategy):
         
         # Plot stock price on secondary y-axis
         ax2 = ax1.twinx()
-        ax2.plot(stock_dates, stock_prices, color='gray', alpha=0.6, label='Stock Price')
+        ax2.plot(stock_dates, stock_prices, color='gray', alpha=0.6, label=f'{self.ticker} Stock Price')
         ax2.set_ylabel('Stock Price ($USD)', color='gray')
         ax2.tick_params(axis='y', labelcolor='gray')
         

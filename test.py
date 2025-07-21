@@ -15,20 +15,20 @@ if __name__ == "__main__":
     sell = 145
     
     # RSI Test
-    # # AMD
-    # ticker = 'AMD'
-    # buy = 30
-    # sell = 70
+    # AMD
+    rsi_ticker = 'AMD'
+    rsi_buy = 30
+    rsi_sell = 70
     
     # #Nvidia
-    # ticker = 'NVDA'
-    # buy = 35
-    # sell = 65
+    # rsi_ticker = 'NVDA'
+    # rsi_buy = 35
+    # rsi_sell = 65
     
     # #Tesla
-    # ticker = 'TSLA'
-    # buy = 28
-    # sell = 72
+    # rsi_ticker = 'TSLA'
+    # rsi_buy = 28
+    # rsi_sell = 72
     
-    PriceThreshold(ticker, buy_price=buy, sell_price=sell, capital=1000, time_period='5Y')    
-    #RSIThreshold(ticker, capital=1000, time_period='5Y')
+   # PriceThreshold(ticker, buy_price=buy, sell_price=sell, capital=1000, time_period='5Y')    
+    RSIThreshold(rsi_ticker, buy_threshold=rsi_buy, sell_threshold=rsi_sell, capital=1000, time_period='1Y')

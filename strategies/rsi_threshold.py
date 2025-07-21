@@ -70,7 +70,7 @@ class RSIThreshold(Strategy):
                 trade_history_df.loc[len(trade_history_df)] = [row['Date'], 'buy', RSI, shares, price, price * shares, cash, index]
                 
             # Sell Stock
-            elif RSI >= self.sell_threshold and shares != 0:
+            elif RSI >= self.sell_threshold and shares > 0:
                 cash += shares * price
                 sell_count += shares
                 trade_history_df.loc[len(trade_history_df)] = [row['Date'], 'sell', RSI, shares, price, price * shares, cash, index]
@@ -105,7 +105,7 @@ class RSIThreshold(Strategy):
             f"Buys: {buy_count} | Sells: {sell_count}"
         )
         
-        trade_history_df.loc[len(trade_history_df)] = [self.ticker_data_df['Date'][len(self.ticker_data_df['Date']) - 1], 'END', np.nan, np.nan, np.nan, np.nan, cash, np.nan] # Add ending capital
+        trade_history_df.loc[len(trade_history_df)] = [self.ticker_data_df['Date'].iloc[-1], 'END', np.nan, np.nan, np.nan, np.nan, cash, np.nan] # Add ending capital
         
         print(f"\n{trade_history_df}")
         

@@ -67,14 +67,15 @@ class Strategy:
     
     def clean_df(self, df: pd.DataFrame) -> pd.DataFrame:
         df.reset_index(inplace=True) # Add numerical index to the df
-        # if self.type == 'Price Threshold':
-        #     df = df[['Date', 'Close']]
-        # elif self.type == 'RSI Threshold':
-        #     pass
-        # elif self.type == 'SMA Crossover':
-        #     pass
-        # else:
-        #     print(f'Invalid strategy type declaration. {self.type} is not an acceptable strategy.')
+        if self.type == 'Price Threshold':
+            pass
+        elif self.type == 'RSI Threshold':
+            pass
+        elif self.type == 'SMA Crossover':
+            df['SMA_short'] = df['Close'].rolling(window=int(self.buy_threshold)).mean()
+            df['SMA_long'] = df['Close'].rolling(window=int(self.sell_threshold)).mean()
+        else:
+            print(f'Invalid strategy type declaration. {self.type} is not an acceptable strategy.')
         return df
     
     def back_test(self):

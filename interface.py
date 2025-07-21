@@ -45,6 +45,7 @@ class CLI:
             '5Y',
         ]
         
+        print()
         for i, period in enumerate(time_periods):
             print(f'({i+1}) {period}')
             

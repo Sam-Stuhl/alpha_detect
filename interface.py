@@ -10,13 +10,13 @@ class CLI:
         self.time_period = self.get_time_period() if not time_period else time_period
         
         # Initialize Strategy   
-        strategies[self.strategy](self.ticker, self.starting_capital, self.time_period)
+        strategies[self.strategy]['class'](self.ticker, self.starting_capital, self.time_period)
     
     def get_strategy(self) -> str:
-        for i, strategy in enumerate(self.strategies.keys()):
+        for i, strategy in enumerate(strategies.keys()):
             print(f'({i + 1}) {strategy}')
         
-        return list(self.strategies.keys())[int(input('Choose a Strategy: ')) - 1]
+        return list(strategies.keys())[int(input('Choose a Strategy: ')) - 1]
     
     def get_ticker(self) -> str:
         while True:

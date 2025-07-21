@@ -3,33 +3,17 @@ from .strategy import Strategy
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import mplfinance as mpf
 
 class PriceThreshold(Strategy):
     def __init__(self, ticker: str, capital: float, time_period: str, buy_price: int = None, sell_price: int = None):
-        super().__init__("Price Threshold", ticker, capital, time_period) # Gives access to type, ticker, and ticker_price_data_df
-        
-        if not(buy_price and sell_price):
-            self.buy_price, self.sell_price = self.get_buy_and_sell()
-        else:
-            self.buy_price = buy_price
-            self.sell_price = sell_price
+        super().__init__("Price Threshold", "price", ticker, capital, time_period, buy_price, sell_price) # Gives access to type, ticker, and ticker_price_data_df
             
         self.back_test()
-        
-    def get_buy_and_sell(self) -> tuple[float, float]:
-        while True:
-            buy_price = float(input(f'\nEnter the price to buy {self.ticker} at: '))
-            if buy_price > self.capital:
-                print("The buy price cannot be greater than the starting capital. Either enter a lower buy price or restart.")
-            else:
-                break
-        sell_price = float(input(f'Enter the price to sell {self.ticker} at: '))
-        
-        return (buy_price, sell_price)
 
     def back_test(self) -> None:
         trade_history_df = pd.DataFrame(columns=['date', 'action', 'shares', 'price_per_share', 'total_price', 'total_val', 'trade_index'])
-        trade_history_df.loc[len(trade_history_df)] = [self.ticker_price_data_df['Date'][0], 'START', np.nan, np.nan, np.nan, self.capital, np.nan] # Add starting capital
+        trade_history_df.loc[len(trade_history_df)] = [self.ticker_data_df['Date'][0], 'START', np.nan, np.nan, np.nan, self.capital, np.nan] # Add starting capital
         
         buy_count = 0
         sell_count = 0
@@ -38,18 +22,18 @@ class PriceThreshold(Strategy):
         shares = 0
         
         # Iterate through ticker data, then buy and sell when it passes thresholds
-        for index, row in self.ticker_price_data_df.iterrows():
+        for index, row in self.ticker_data_df.iterrows():
             price = row['Close']
             
             # Buy Stock
-            if price <= self.buy_price and shares == 0:
+            if price <= self.buy_threshold and shares == 0:
                 shares = int(cash // price)
                 cash -= shares * price
                 buy_count += shares
                 trade_history_df.loc[len(trade_history_df)] = [row['Date'], 'buy', shares, price, price * shares, cash, index]
                 
             # Sell Stock
-            elif price >= self.sell_price and shares != 0:
+            elif price >= self.sell_threshold and shares != 0:
                 cash += shares * price
                 sell_count += shares
                 trade_history_df.loc[len(trade_history_df)] = [row['Date'], 'sell', shares, price, price * shares, cash, index]
@@ -59,7 +43,7 @@ class PriceThreshold(Strategy):
         # print(f"\nPrice Threshold ({self.ticker}) Back Test Results")
         
         # Liquidate remaining shares at final price
-        final_price = self.ticker_price_data_df['Close'].iloc[-1]
+        final_price = self.ticker_data_df['Close'].iloc[-1]
         if shares > 0:
             cash += shares * final_price
             #print(f"   Liquidated {shares} shares at final price ${final_price:.2f}")
@@ -80,7 +64,7 @@ class PriceThreshold(Strategy):
             f"Buys: {buy_count} | Sells: {sell_count}"
         )
         
-        trade_history_df.loc[len(trade_history_df)] = [self.ticker_price_data_df['Date'][len(self.ticker_price_data_df['Date']) - 1], 'END', np.nan, np.nan, np.nan, cash, np.nan] # Add ending capital
+        trade_history_df.loc[len(trade_history_df)] = [self.ticker_data_df['Date'][len(self.ticker_data_df['Date']) - 1], 'END', np.nan, np.nan, np.nan, cash, np.nan] # Add ending capital
         
         print(f"\n{trade_history_df}")
         
@@ -92,8 +76,8 @@ class PriceThreshold(Strategy):
         strategy_values = trade_history_df['total_val']
         
         # Get stock price history
-        stock_dates = self.ticker_price_data_df['Date']
-        stock_prices = self.ticker_price_data_df['Close']
+        stock_dates = self.ticker_data_df['Date']
+        stock_prices = self.ticker_data_df['Close']
         
         # Simulate buy-and-hold values
         first_price = stock_prices.iloc[0]
@@ -105,8 +89,8 @@ class PriceThreshold(Strategy):
         fig, ax1 = plt.subplots(figsize=(12,6))
         
         # Plot portfolio values
-        ax1.plot(strategy_dates, strategy_values, color='purple', label=f'Portfolio Value', linewidth=2)
-        ax1.plot(stock_dates, buy_and_hold_values, color='green', linestyle='--', label='Buy & Hold Value')
+        portfolio_line = ax1.plot(strategy_dates, strategy_values, color='purple', label=f'Portfolio Value', linewidth=2)
+        buy_hold_line = ax1.plot(stock_dates, buy_and_hold_values, color='brown', linestyle='--', label='Buy & Hold Value')
         
         ax1.set_xlabel('')
         ax1.set_ylabel(f'Portfolio Value ($USD)', color='black')
@@ -119,8 +103,8 @@ class PriceThreshold(Strategy):
         ax2.tick_params(axis='y', labelcolor='gray')
         
         # Plot threshold lines
-        plt.axhline(y=self.buy_price, color='red', linestyle='--', label='Buy Threshold')
-        plt.axhline(y=self.sell_price, color='green', linestyle='--', label='Sell Threshold')
+        plt.axhline(y=self.buy_threshold, color='red', linestyle='--', label='Buy Threshold')
+        plt.axhline(y=self.sell_threshold, color='green', linestyle='--', label='Sell Threshold')
         
         # Plot Buy and Sell Markers
         buys = trade_history_df[trade_history_df['action'] == 'buy']
@@ -146,10 +130,9 @@ class PriceThreshold(Strategy):
         
         # Title and Legends
         plt.title(f'{self.ticker} Backtest: {self.type} Strategy vs. Buy & Hold')
-        ax1.legend(loc='upper left')
-        ax2. legend(loc='upper right')
+        legend1 = ax1.legend(loc='upper left')
+        legend2 = ax2.legend(loc='upper right')
         
         plt.tight_layout()
         plt.show()
-        
-        
+                

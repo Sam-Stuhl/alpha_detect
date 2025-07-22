@@ -3,9 +3,21 @@ from .strategy import Strategy
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import mplfinance as mpf
 
 class PriceThreshold(Strategy):
+    
+    # Stative variables
+    time_periods = [
+            '1W',
+            '1M',
+            '3M',
+            '6M',
+            '1Y',
+            '5Y',
+        ]
+    
+    name = "Price Threshold"
+    
     def __init__(self, ticker: str, capital: float, time_period: str, buy_price: int = None, sell_price: int = None):
         super().__init__("Price Threshold", "price", ticker, capital, time_period, buy_price, sell_price) # Gives access to type, ticker, and ticker_price_data_df
             
@@ -38,23 +50,12 @@ class PriceThreshold(Strategy):
                 sell_count += shares
                 trade_history_df.loc[len(trade_history_df)] = [row['Date'], 'sell', shares, price, price * shares, cash, index]
                 shares = 0
-                
-                
-        # print(f"\nPrice Threshold ({self.ticker}) Back Test Results")
         
         # Liquidate remaining shares at final price
         final_price = self.ticker_data_df['Close'].iloc[-1]
         if shares > 0:
             cash += shares * final_price
-            #print(f"   Liquidated {shares} shares at final price ${final_price:.2f}")
             shares = 0
-            
-        # print(f"   Starting Capital: ${self.capital}")
-        # print(f"   End Capital: ${cash:.2f}")
-        # print(f"   Net Profit: ${(cash - self.capital):.2f}")
-        # print(f"   Percentage Return: {((cash - self.capital) / self.capital) * 100:.2f}%")
-        # print(f"   Number of shares bought: {buy_count}")
-        # print(f"   Number of times sold: {sell_count}")
         
         summary_text = (
             f"Start Capital: ${self.capital:.2f}\n"
@@ -123,10 +124,6 @@ class PriceThreshold(Strategy):
             fontsize=10,
             bbox=dict(facecolor='white', alpha=0.8, boxstyle='round')
         )
-        # fig.text(
-        #     0.01, -0.15, summary_text,
-        #     ha='left', va='top', fontsize=10, wrap=True
-        # )
         
         # Title and Legends
         plt.title(f'{self.ticker} Backtest: {self.type} Strategy vs. Buy & Hold')

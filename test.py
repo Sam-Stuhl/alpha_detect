@@ -2,7 +2,9 @@ from strategies import PriceThreshold, RSIThreshold, SMACrossover
 
 
 if __name__ == "__main__":
-    # Test Stocks
+    """
+    Price Threshold Test
+    """
     
     # # Palantir
     # ticker = 'PLTR'
@@ -14,7 +16,9 @@ if __name__ == "__main__":
     buy = 110
     sell = 145
     
-    # RSI Test
+    """
+    RSI Threshold Test
+    """
     # AMD
     rsi_ticker = 'AMD'
     rsi_buy = 30
@@ -30,5 +34,15 @@ if __name__ == "__main__":
     # rsi_buy = 28
     # rsi_sell = 72
     
+    """
+    SMA Crossover Test
+    """
+    
+    # AMD
+    sma_ticker = 'AMD'
+    sma_buy = 10
+    sma_sell = 50
+    
    # PriceThreshold(ticker, buy_price=buy, sell_price=sell, capital=1000, time_period='5Y')    
-    RSIThreshold(rsi_ticker, buy_threshold=rsi_buy, sell_threshold=rsi_sell, capital=1000, time_period='1Y')
+    #RSIThreshold(rsi_ticker, buy_threshold=rsi_buy, sell_threshold=rsi_sell, capital=1000, time_period='1Y')
+    SMACrossover(sma_ticker, 1000, '5Y', sma_buy, sma_sell)

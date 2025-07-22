@@ -18,7 +18,6 @@ class Strategy:
         self.ticker_data_df = self.get_ticker_data(time_period)
         
         
-    
     def get_buy_and_sell_thresholds(self) -> tuple[float, float]:
         
         while True:
@@ -40,9 +39,7 @@ class Strategy:
         
         end = datetime.today()
         
-        if time_period == '1D':
-            start = end - relativedelta(days=1)
-        elif time_period == '1W':
+        if time_period == '1W':
             start = end - relativedelta(days=7)
         elif time_period == '1M':
             start = end - relativedelta(months=1)
@@ -60,10 +57,6 @@ class Strategy:
             start = '2020-01-01'
         
         return self.clean_df(yf.Ticker(self.ticker).history(start=start, end=end))
-        #return yf.Ticker(self.ticker).history(start=start, end=end)
-        
-
-    
     
     def clean_df(self, df: pd.DataFrame) -> pd.DataFrame:
         df.reset_index(inplace=True) # Add numerical index to the df

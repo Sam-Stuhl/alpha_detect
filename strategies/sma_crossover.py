@@ -5,6 +5,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class SMACrossover(Strategy):
+    
+    # Static variable
+    time_periods = [
+            '1M',
+            '3M',
+            '6M',
+            '1Y',
+            '3Y',
+            '5Y',
+        ]
+    
+    name = 'SMA Crossover'
+    
     def __init__(self, ticker: str, capital: float, time_period: str, buy_threshold: float = None, sell_threshold: float = None):
         super().__init__("SMA Crossover", "SMA", ticker, capital, time_period, buy_threshold, sell_threshold)
         
@@ -27,9 +40,6 @@ class SMACrossover(Strategy):
             short_sma = row['SMA_short']
             long_sma = row['SMA_long']
             
-            # Get previous sma values to prevent over trading
-            prev_short_sma = self.ticker_data_df['SMA_short'].shift(1)
-            
             if not(pd.isna(short_sma) or pd.isna(long_sma)):
             
                 # Buy Stock
@@ -45,23 +55,12 @@ class SMACrossover(Strategy):
                     sell_count += shares
                     trade_history_df.loc[len(trade_history_df)] = [row['Date'], 'sell', short_sma, long_sma, shares, price, price * shares, cash, index]
                     shares = 0
-                
-                
-        # print(f"\nPrice Threshold ({self.ticker}) Back Test Results")
         
         # Liquidate remaining shares at final price
         final_price = self.ticker_data_df['Close'].iloc[-1]
         if shares > 0:
             cash += shares * final_price
-            #print(f"   Liquidated {shares} shares at final price ${final_price:.2f}")
             shares = 0
-            
-        # print(f"   Starting Capital: ${self.capital}")
-        # print(f"   End Capital: ${cash:.2f}")
-        # print(f"   Net Profit: ${(cash - self.capital):.2f}")
-        # print(f"   Percentage Return: {((cash - self.capital) / self.capital) * 100:.2f}%")
-        # print(f"   Number of shares bought: {buy_count}")
-        # print(f"   Number of times sold: {sell_count}")
         
         summary_text = (
             f"Start Capital: ${self.capital:.2f}\n"
@@ -94,7 +93,6 @@ class SMACrossover(Strategy):
         
         # Create the plot
         fig, (ax1, ax3) = plt.subplots(2, 1, figsize=(12,6), sharex=True, gridspec_kw={'height_ratios': [2, 1]})
-        #fig, ax1 = plt.subplots(figsize=(12,6))
         
         # Plot portfolio values
         portfolio_line = ax1.plot(strategy_dates, strategy_values, color='purple', label=f'Portfolio Value', linewidth=2)
@@ -114,7 +112,7 @@ class SMACrossover(Strategy):
         #Plot SMAs on second subplot
         ax3.plot(trade_history_df['date'], trade_history_df['SMA_short'], color='blue', label='Short SMA')
         ax3.plot(trade_history_df['date'], trade_history_df['SMA_long'], color='red', label='Long SMA')
-        ax3.set_ylabel('SMA')
+        ax3.set_ylabel('SMA Value')
         ax3.set_xlabel('')
         ax3.legend(loc='upper right')
         
@@ -135,10 +133,6 @@ class SMACrossover(Strategy):
             fontsize=10,
             bbox=dict(facecolor='white', alpha=0.8, boxstyle='round')
         )
-        # fig.text(
-        #     0.01, -0.15, summary_text,
-        #     ha='left', va='top', fontsize=10, wrap=True
-        # )
         
         # Title and Legends
         plt.title(f'{self.ticker} Backtest: {self.type} Strategy vs. Buy & Hold')

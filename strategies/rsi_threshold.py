@@ -5,7 +5,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class RSIThreshold(Strategy):
-    def __init__(self, ticker: str, capital: float, time_period: str, buy_threshold: float = 30, sell_threshold: float = 70):
+    
+    # Static variables
+    time_periods = [
+            '1W',
+            '1M',
+            '3M',
+            '6M',
+            '1Y',
+            '5Y',
+        ]
+    
+    name = "RSI Threshold"
+    
+    def __init__(self, ticker: str, capital: float, time_period: str, buy_threshold: float = None, sell_threshold: float = None):
         super().__init__("RSI Threshold", "RSI", ticker, capital, time_period, buy_threshold, sell_threshold)
         
         self.back_test()
@@ -77,25 +90,13 @@ class RSIThreshold(Strategy):
                 shares = 0
             
             prev_avg_gain = avg_gain
-            prev_avg_loss = avg_loss
-                
-                
-                
-        # print(f"\nPrice Threshold ({self.ticker}) Back Test Results")
+            prev_avg_loss = avg_loss            
         
         # Liquidate remaining shares at final price
         final_price = self.ticker_data_df['Close'].iloc[-1]
         if shares > 0:
             cash += shares * final_price
-            #print(f"   Liquidated {shares} shares at final price ${final_price:.2f}")
             shares = 0
-            
-        # print(f"   Starting Capital: ${self.capital}")
-        # print(f"   End Capital: ${cash:.2f}")
-        # print(f"   Net Profit: ${(cash - self.capital):.2f}")
-        # print(f"   Percentage Return: {((cash - self.capital) / self.capital) * 100:.2f}%")
-        # print(f"   Number of shares bought: {buy_count}")
-        # print(f"   Number of times sold: {sell_count}")
         
         summary_text = (
             f"Start Capital: ${self.capital:.2f}\n"
@@ -136,7 +137,6 @@ class RSIThreshold(Strategy):
         
         # Create the plot
         fig, (ax1, ax3) = plt.subplots(2, 1, figsize=(12,6), sharex=True, gridspec_kw={'height_ratios': [2, 1]})
-        #fig, ax1 = plt.subplots(figsize=(12,6))
         
         # Plot portfolio values
         portfolio_line = ax1.plot(strategy_dates, strategy_values, color='purple', label=f'Portfolio Value', linewidth=2)
@@ -145,7 +145,6 @@ class RSIThreshold(Strategy):
         ax1.set_xlabel('')
         ax1.set_ylabel(f'Portfolio Value ($USD)', color='black')
         ax1.tick_params(axis='y')
-        
         
         
         # Plot stock price on secondary y-axis
@@ -158,20 +157,9 @@ class RSIThreshold(Strategy):
         ax3.plot(list(rsi_values.keys()), list(rsi_values.values()), color='blue', label='RSI')
         ax3.axhline(y=self.sell_threshold, color='orange', linestyle='--', alpha=0.6, label='RSI Overbought')
         ax3.axhline(y=self.buy_threshold, color='cyan', linestyle='--', alpha=0.6, label='RSI Oversold')
-        ax3.set_ylabel('RSI')
-        ax3.set_xlabel('Date')
+        ax3.set_ylabel('RSI Value')
+        ax3.set_xlabel('')
         ax3.legend(loc='upper right')
-        
-        # # Plot the RSI
-        # ax3 = ax1.twinx()
-        # ax3.spines['right'].set_position(('axes', 1.1))
-        # ax3.plot(list(rsi_values.keys()), list(rsi_values.values()), color='blue', linestyle='-', label='RSI')
-        # ax3.set_ylabel('RSI', color='blue')
-        # ax3.tick_params(axis='y', labelcolor='blue')
-        
-        # # Plot RSI thresholds
-        # ax3.axhline(y=self.sell_threshold, color='orange', linestyle='--', alpha=0.6, label='RSI Overbought')
-        # ax3.axhline(y=self.buy_threshold, color='cyan', linestyle='--', alpha=0.6, label='RSI Oversold')
         
         # Plot Buy and Sell Markers
         buys = trade_history_df[trade_history_df['action'] == 'buy']
@@ -190,10 +178,6 @@ class RSIThreshold(Strategy):
             fontsize=10,
             bbox=dict(facecolor='white', alpha=0.8, boxstyle='round')
         )
-        # fig.text(
-        #     0.01, -0.15, summary_text,
-        #     ha='left', va='top', fontsize=10, wrap=True
-        # )
         
         # Title and Legends
         plt.title(f'{self.ticker} Backtest: {self.type} Strategy vs. Buy & Hold')

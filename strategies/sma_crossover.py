@@ -67,13 +67,13 @@ class SMACrossover(Strategy):
                 if short_sma > long_sma and shares == 0:
                     shares = int(cash // price)
                     cash -= shares * price
-                    buy_count += shares
+                    buy_count += 1
                     trade_history_df.loc[len(trade_history_df)] = [row['Date'], 'buy', short_sma, long_sma, shares, price, price * shares, cash, index]
                     
                 # Sell Stock
                 elif short_sma < long_sma and shares > 0:
                     cash += shares * price
-                    sell_count += shares
+                    sell_count += 1
                     trade_history_df.loc[len(trade_history_df)] = [row['Date'], 'sell', short_sma, long_sma, shares, price, price * shares, cash, index]
                     shares = 0
         

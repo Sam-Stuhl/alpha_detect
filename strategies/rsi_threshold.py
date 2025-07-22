@@ -98,13 +98,13 @@ class RSIThreshold(Strategy):
             if RSI <= self.buy_threshold and shares == 0:
                 shares = int(cash // price)
                 cash -= shares * price
-                buy_count += shares
+                buy_count += 1
                 trade_history_df.loc[len(trade_history_df)] = [row['Date'], 'buy', RSI, shares, price, price * shares, cash, index]
                 
             # Sell Stock
             elif RSI >= self.sell_threshold and shares > 0:
                 cash += shares * price
-                sell_count += shares
+                sell_count += 1
                 trade_history_df.loc[len(trade_history_df)] = [row['Date'], 'sell', RSI, shares, price, price * shares, cash, index]
                 shares = 0
             

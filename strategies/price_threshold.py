@@ -19,9 +19,26 @@ class PriceThreshold(Strategy):
     name = "Price Threshold"
     
     def __init__(self, ticker: str, capital: float, time_period: str, buy_price: int = None, sell_price: int = None):
-        super().__init__("Price Threshold", "price", ticker, capital, time_period, buy_price, sell_price) # Gives access to type, ticker, and ticker_price_data_df
+        super().__init__("Price Threshold", ticker, capital, time_period)
+            
+        self.buy_threshold, self.sell_threshold = self.get_buy_and_sell_thresholds() if not(buy_price and sell_price) else (buy_price, sell_price)
             
         self.back_test()
+        
+    def get_buy_and_sell_thresholds(self) -> tuple[float, float]:
+        
+        while True:
+            buy_threshold = float(input(f'\nEnter the price to buy {self.ticker} at: '))
+            sell_threshold = float(input(f'Enter the price to sell {self.ticker} at: '))
+            
+            if buy_threshold > self.capital:
+                print(f"The buy price cannot be greater than the starting capital. Either enter a lower buy price or restart.")
+            elif buy_threshold > sell_threshold:
+                print(f"The buy price cannot be greater than the sell price. Try again.")
+            else:
+                break
+        
+        return (buy_threshold, sell_threshold)
 
     def back_test(self) -> None:
         trade_history_df = pd.DataFrame(columns=['date', 'action', 'shares', 'price_per_share', 'total_price', 'total_val', 'trade_index'])

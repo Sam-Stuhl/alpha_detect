@@ -19,9 +19,28 @@ class RSIThreshold(Strategy):
     name = "RSI Threshold"
     
     def __init__(self, ticker: str, capital: float, time_period: str, buy_threshold: float = None, sell_threshold: float = None):
-        super().__init__("RSI Threshold", "RSI", ticker, capital, time_period, buy_threshold, sell_threshold)
+        super().__init__("RSI Threshold", ticker, capital, time_period)
+        
+        self.buy_threshold, self.sell_threshold = self.get_buy_and_sell_thresholds() if not(buy_threshold and sell_threshold) else (buy_threshold, sell_threshold)
         
         self.back_test()
+        
+    def get_buy_and_sell_thresholds(self) -> tuple[float, float]:
+        
+        while True:
+            try:
+                buy_threshold = float(input(f'\nEnter the RSI to buy {self.ticker} at (default 30): '))
+                sell_threshold = float(input(f'Enter the RSI to sell {self.ticker} at (default 70): '))
+            except Exception:
+                buy_threshold = 30
+                sell_threshold = 70
+            
+            if buy_threshold > sell_threshold:
+                print(f"The buy price cannot be greater than the sell price. Try again.")
+            else:
+                break
+        
+        return (buy_threshold, sell_threshold)
         
     def back_test(self) -> None:
         trade_history_df = pd.DataFrame(columns=['date', 'action', 'rsi', 'shares', 'price_per_share', 'total_price', 'total_val', 'trade_index'])

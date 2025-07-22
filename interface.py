@@ -46,7 +46,7 @@ class CLI:
     def is_valid_ticker(self, ticker: str) -> bool:
         try:
             stock = yf.Ticker(ticker)
-            hist = stock.history(period='1d')
+            hist = stock.history(period='5Y')
             return not hist.empty # If it is empty then, then it's not a valid ticker
         except Exception:
             return False

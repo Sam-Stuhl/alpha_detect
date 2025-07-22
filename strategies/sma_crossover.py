@@ -18,10 +18,31 @@ class SMACrossover(Strategy):
     
     name = 'SMA Crossover'
     
-    def __init__(self, ticker: str, capital: float, time_period: str, buy_threshold: float = None, sell_threshold: float = None):
-        super().__init__("SMA Crossover", "SMA", ticker, capital, time_period, buy_threshold, sell_threshold)
+    def __init__(self, ticker: str, capital: float, time_period: str, short_sma: float = None, long_sma: float = None):
+        super().__init__("SMA Crossover", ticker, capital, time_period)
+        
+        self.short_sma, self.long_sma = self.get_sma() if not(short_sma and long_sma) else (short_sma, long_sma)
+        
+        self.ticker_data_df['SMA_short'] = self.ticker_data_df['Close'].rolling(window=int(self.short_sma)).mean()
+        self.ticker_data_df['SMA_long'] = self.ticker_data_df['Close'].rolling(window=int(self.long_sma)).mean()
         
         self.back_test()
+        
+    def get_sma(self) -> tuple[float, float]:
+        while True:
+            try:
+                short_sma = float(input('\nEnter the window for the short SMA (in days) (default 10 days): '))
+                long_sma = float(input('Enter the window for the long SMA (in days) (default 50 days): '))
+            except Exception:
+                short_sma = 10
+                long_sma = 50
+            
+            if short_sma >= long_sma:
+                print(f'The short SMA must have a smaller window than the long SMA. Try again.')
+            else:
+                break
+            
+        return (short_sma, long_sma)
         
     def back_test(self) -> None:
         trade_history_df = pd.DataFrame(columns=['date', 'action', 'SMA_short', 'SMA_long', 'shares', 'price_per_share', 'total_price', 'total_val', 'trade_index'])

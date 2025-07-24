@@ -50,9 +50,17 @@ class PriceThreshold(Strategy):
         cash = self.capital
         shares = 0
         
+        portfolio_values = []
+        dates = []
+        
         # Iterate through ticker data, then buy and sell when it passes thresholds
         for index, row in self.ticker_data_df.iterrows():
+            date = row['Date']
             price = row['Close']
+            
+            total_value = cash + shares * price
+            portfolio_values.append(total_value)
+            dates.append(date)
             
             # Buy Stock
             if price <= self.buy_threshold and shares == 0:
@@ -86,13 +94,11 @@ class PriceThreshold(Strategy):
         
         print(f"\n{trade_history_df}")
         
-        self.plot_backtest_results(trade_history_df, summary_text)
+        portfolio_df = pd.DataFrame({'Date': dates, 'Portfolio Value': portfolio_values})
         
-    def plot_backtest_results(self, trade_history_df: pd.DataFrame, summary_text: str) -> None:
-        # Get Strategy values
-        strategy_dates = trade_history_df['date']
-        strategy_values = trade_history_df['total_val']
+        self.plot_backtest_results(trade_history_df, summary_text, portfolio_df)
         
+    def plot_backtest_results(self, trade_history_df: pd.DataFrame, summary_text: str, portfolio_df: pd.DataFrame) -> None:
         # Get stock price history
         stock_dates = self.ticker_data_df['Date']
         stock_prices = self.ticker_data_df['Close']
@@ -107,7 +113,7 @@ class PriceThreshold(Strategy):
         fig, ax1 = plt.subplots(figsize=(12,6))
         
         # Plot portfolio values
-        portfolio_line = ax1.plot(strategy_dates, strategy_values, color='purple', label=f'Portfolio Value', linewidth=2)
+        portfolio_line = ax1.plot(portfolio_df['Date'], portfolio_df['Portfolio Value'], color='teal', label='Portfolio Value', linewidth=2)
         buy_hold_line = ax1.plot(stock_dates, buy_and_hold_values, color='brown', linestyle='--', label='Buy & Hold Value')
         
         ax1.set_xlabel('')

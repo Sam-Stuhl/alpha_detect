@@ -20,19 +20,19 @@ if __name__ == "__main__":
     RSI Threshold Test
     """
     # AMD
-    rsi_ticker = 'AMD'
-    rsi_buy = 30
-    rsi_sell = 70
+    # rsi_ticker = 'AMD'
+    # rsi_buy = 30
+    # rsi_sell = 70
     
     # #Nvidia
     # rsi_ticker = 'NVDA'
     # rsi_buy = 35
     # rsi_sell = 65
     
-    # #Tesla
-    # rsi_ticker = 'TSLA'
-    # rsi_buy = 28
-    # rsi_sell = 72
+    #Tesla
+    rsi_ticker = 'TSLA'
+    rsi_buy = 28
+    rsi_sell = 72
     
     """
     SMA Crossover Test

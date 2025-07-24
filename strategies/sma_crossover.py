@@ -54,9 +54,17 @@ class SMACrossover(Strategy):
         cash = self.capital
         shares = 0
         
+        portfolio_values = []
+        dates = []
+        
         # Iterate through ticker data, then buy and sell when it passes thresholds
         for index, row in self.ticker_data_df.iterrows():
+            date = row['Date']
             price = row['Close']
+            
+            total_value = cash + shares * price
+            portfolio_values.append(total_value)
+            dates.append(date)
             
             short_sma = row['SMA_short']
             long_sma = row['SMA_long']
@@ -95,9 +103,11 @@ class SMACrossover(Strategy):
         
         print(f"\n{trade_history_df}")
         
-        self.plot_backtest_results(trade_history_df, summary_text)
+        portfolio_df = pd.DataFrame({'Date': dates, 'Portfolio Value': portfolio_values})
         
-    def plot_backtest_results(self, trade_history_df: pd.DataFrame, summary_text: str) -> None:
+        self.plot_backtest_results(trade_history_df, summary_text, portfolio_df)
+        
+    def plot_backtest_results(self, trade_history_df: pd.DataFrame, summary_text: str, portfolio_df: pd.DataFrame) -> None:
         # Get Strategy values
         strategy_dates = trade_history_df['date']
         strategy_values = trade_history_df['total_val']
@@ -116,7 +126,7 @@ class SMACrossover(Strategy):
         fig, (ax1, ax3) = plt.subplots(2, 1, figsize=(12,6), sharex=True, gridspec_kw={'height_ratios': [2, 1]})
         
         # Plot portfolio values
-        portfolio_line = ax1.plot(strategy_dates, strategy_values, color='purple', label=f'Portfolio Value', linewidth=2)
+        portfolio_line = ax1.plot(portfolio_df['Date'], portfolio_df['Portfolio Value'], color='teal', label='Portfolio Value', linewidth=2)
         buy_hold_line = ax1.plot(stock_dates, buy_and_hold_values, color='brown', linestyle='--', label='Buy & Hold Value')
         
         ax1.set_xlabel('')

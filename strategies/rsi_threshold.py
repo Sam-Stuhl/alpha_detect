@@ -52,6 +52,9 @@ class RSIThreshold(Strategy):
         cash = self.capital
         shares = 0
         
+        portfolio_values = []
+        dates = []
+        
         # Calculate RSI
         rsi_values = {}
         
@@ -77,6 +80,11 @@ class RSIThreshold(Strategy):
         for index in range(14, len(self.ticker_data_df)):
             row = self.ticker_data_df.iloc[index]
             price = row['Close']
+            date = row['Date']
+            
+            total_value = cash + shares * price
+            portfolio_values.append(total_value)
+            dates.append(date)
             
             # Get new RSI
             prev_close = self.ticker_data_df.iloc[index-1]['Close']
@@ -129,7 +137,9 @@ class RSIThreshold(Strategy):
         
         print(f"\n{trade_history_df}")
         
-        self.plot_backtest_results(trade_history_df, summary_text, rsi_values)
+        portfolio_df = pd.DataFrame({'Date': dates, 'Portfolio Value': portfolio_values})
+        
+        self.plot_backtest_results(trade_history_df, summary_text, rsi_values, portfolio_df)
     
     def calc_RSI(self, avg_gain: float, avg_loss: float) -> float:
         if avg_loss == 0:
@@ -139,11 +149,7 @@ class RSIThreshold(Strategy):
         
         return RSI
     
-    def plot_backtest_results(self, trade_history_df: pd.DataFrame, summary_text: str, rsi_values: dict) -> None:
-        # Get Strategy values
-        strategy_dates = trade_history_df['date']
-        strategy_values = trade_history_df['total_val']
-        
+    def plot_backtest_results(self, trade_history_df: pd.DataFrame, summary_text: str, rsi_values: dict, portfolio_df: pd.DataFrame) -> None:        
         # Get stock price history
         stock_dates = self.ticker_data_df['Date']
         stock_prices = self.ticker_data_df['Close']
@@ -158,7 +164,7 @@ class RSIThreshold(Strategy):
         fig, (ax1, ax3) = plt.subplots(2, 1, figsize=(12,6), sharex=True, gridspec_kw={'height_ratios': [2, 1]})
         
         # Plot portfolio values
-        portfolio_line = ax1.plot(strategy_dates, strategy_values, color='purple', label=f'Portfolio Value', linewidth=2)
+        portfolio_line = ax1.plot(portfolio_df['Date'], portfolio_df['Portfolio Value'], color='teal', label='Portfolio Value', linewidth=2)
         buy_hold_line = ax1.plot(stock_dates, buy_and_hold_values, color='brown', linestyle='--', label='Buy & Hold Value')
         
         ax1.set_xlabel('')

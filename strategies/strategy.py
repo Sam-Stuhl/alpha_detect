@@ -1,5 +1,6 @@
 import yfinance as yf
 import pandas as pd
+import numpy as np
 from datetime import datetime
 
 class Strategy:
@@ -40,3 +41,14 @@ class Strategy:
     
     def back_test(self):
         raise NotImplementedError("Subclasses must implement back_test()")
+    
+    def calc_sharpe_ratio(self, daily_returns: pd.Series, risk_free_rate: float = 0.0) -> float:
+        if daily_returns.std() == 0 or daily_returns.isna().all():
+            return 0.0
+        
+        excess_returns = daily_returns - (risk_free_rate / 252)
+        
+        sharpe_ratio = excess_returns.mean() / excess_returns.std()
+        annualized_sharpe = sharpe_ratio * np.sqrt(252)
+        
+        return round(annualized_sharpe, 3)

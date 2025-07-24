@@ -52,8 +52,7 @@ class RSIThreshold(Strategy):
         cash = self.capital
         shares = 0
         
-        portfolio_values = []
-        dates = []
+        portfolio_df = pd.DataFrame(columns=['Date', 'Portfolio Value'])
         
         # Calculate RSI
         rsi_values = {}
@@ -83,8 +82,7 @@ class RSIThreshold(Strategy):
             date = row['Date']
             
             total_value = cash + shares * price
-            portfolio_values.append(total_value)
-            dates.append(date)
+            portfolio_df.loc[index] = [date, total_value]
             
             # Get new RSI
             prev_close = self.ticker_data_df.iloc[index-1]['Close']
@@ -124,20 +122,23 @@ class RSIThreshold(Strategy):
         if shares > 0:
             cash += shares * final_price
             shares = 0
+            
+        # Get Sharpe Ratio
+        daily_returns = portfolio_df['Portfolio Value'].pct_change()
+        sharpe_ratio = self.calc_sharpe_ratio(daily_returns)
         
         summary_text = (
             f"Start Capital: ${self.capital:.2f}\n"
             f"End Capital: ${cash:.2f}\n"
             f"Net Profit: ${(cash - self.capital):.2f}\n"
             f"Return: {((cash - self.capital) / self.capital) * 100:.2f}%\n"
+            f"Sharpe Ratio: {sharpe_ratio}\n"
             f"Buys: {buy_count} | Sells: {sell_count}"
         )
         
         trade_history_df.loc[len(trade_history_df)] = [self.ticker_data_df['Date'].iloc[-1], 'END', np.nan, np.nan, np.nan, np.nan, cash, np.nan] # Add ending capital
         
         print(f"\n{trade_history_df}")
-        
-        portfolio_df = pd.DataFrame({'Date': dates, 'Portfolio Value': portfolio_values})
         
         self.plot_backtest_results(trade_history_df, summary_text, rsi_values, portfolio_df)
     

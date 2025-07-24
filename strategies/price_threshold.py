@@ -50,8 +50,7 @@ class PriceThreshold(Strategy):
         cash = self.capital
         shares = 0
         
-        portfolio_values = []
-        dates = []
+        portfolio_df = pd.DataFrame(columns=['Date', 'Portfolio Value'])
         
         # Iterate through ticker data, then buy and sell when it passes thresholds
         for index, row in self.ticker_data_df.iterrows():
@@ -59,8 +58,7 @@ class PriceThreshold(Strategy):
             price = row['Close']
             
             total_value = cash + shares * price
-            portfolio_values.append(total_value)
-            dates.append(date)
+            portfolio_df.loc[index] = [date, total_value]
             
             # Buy Stock
             if price <= self.buy_threshold and shares == 0:
@@ -81,12 +79,17 @@ class PriceThreshold(Strategy):
         if shares > 0:
             cash += shares * final_price
             shares = 0
+            
+        # Get Sharpe Ratio
+        daily_returns = portfolio_df['Portfolio Value'].pct_change()
+        sharpe_ratio = self.calc_sharpe_ratio(daily_returns)
         
         summary_text = (
             f"Start Capital: ${self.capital:.2f}\n"
             f"End Capital: ${cash:.2f}\n"
             f"Net Profit: ${(cash - self.capital):.2f}\n"
             f"Return: {((cash - self.capital) / self.capital) * 100:.2f}%\n"
+            f"Sharpe Ratio: {sharpe_ratio}\n"
             f"Buys: {buy_count} | Sells: {sell_count}"
         )
         
@@ -94,7 +97,7 @@ class PriceThreshold(Strategy):
         
         print(f"\n{trade_history_df}")
         
-        portfolio_df = pd.DataFrame({'Date': dates, 'Portfolio Value': portfolio_values})
+        
         
         self.plot_backtest_results(trade_history_df, summary_text, portfolio_df)
         

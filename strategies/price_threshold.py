@@ -1,8 +1,10 @@
+from matplotlib.widgets import CheckButtons
 from .strategy import Strategy
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import mplfinance as mpf
 
 class PriceThreshold(Strategy):
     
@@ -116,8 +118,8 @@ class PriceThreshold(Strategy):
         fig, ax1 = plt.subplots(figsize=(12,6))
         
         # Plot portfolio values
-        portfolio_line = ax1.plot(portfolio_df['Date'], portfolio_df['Portfolio Value'], color='teal', label='Portfolio Value', linewidth=2)
-        buy_hold_line = ax1.plot(stock_dates, buy_and_hold_values, color='brown', linestyle='--', label='Buy & Hold Value')
+        buy_hold_line, = ax1.plot(stock_dates, buy_and_hold_values, color='brown', linestyle='--', label='Buy & Hold Value', linewidth=0.75)
+        portfolio_line, = ax1.plot(portfolio_df['Date'], portfolio_df['Portfolio Value'], color='teal', label='Portfolio Value', linewidth=0.75)
         
         ax1.set_xlabel('')
         ax1.set_ylabel(f'Portfolio Value ($USD)', color='black')
@@ -125,7 +127,17 @@ class PriceThreshold(Strategy):
         
         # Plot stock price on secondary y-axis
         ax2 = ax1.twinx()
-        ax2.plot(stock_dates, stock_prices, color='gray', alpha=0.6, label=f'{self.ticker} Stock Price')
+        #ax2.plot(stock_dates, stock_prices, color='gray', alpha=0.6, label=f'{self.ticker} Stock Price')
+        mpf.plot(
+            self.ticker_data_df.set_index('Date'),
+            type='candle',
+            ax=ax2,
+            style='yahoo',
+            show_nontrading=True,
+            warn_too_much_data=len(self.ticker_data_df) + 1,
+            
+        )
+
         ax2.set_ylabel('Stock Price ($USD)', color='gray')
         ax2.tick_params(axis='y', labelcolor='gray')
         
@@ -137,8 +149,8 @@ class PriceThreshold(Strategy):
         buys = trade_history_df[trade_history_df['action'] == 'buy']
         sells = trade_history_df[trade_history_df['action'] == 'sell']
         
-        plt.scatter(buys['date'], buys['price_per_share'], color='red', marker='^', label='Buy')
-        plt.scatter(sells['date'], sells['price_per_share'], color='green', marker='v', label='Sell')
+        plt.scatter(buys['date'], buys['price_per_share'], color='red', marker='^', label='Buy', edgecolors='black')
+        plt.scatter(sells['date'], sells['price_per_share'], color='green', marker='v', label='Sell', edgecolors='black')
         
         # Add Summary
         plt.text(
@@ -157,5 +169,7 @@ class PriceThreshold(Strategy):
         legend2 = ax2.legend(loc='upper right')
         
         plt.tight_layout()
+        plt.draw()
+        plt.pause(0.001)
         plt.show()
                 

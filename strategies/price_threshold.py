@@ -8,16 +8,7 @@ import mplfinance as mpf
 
 class PriceThreshold(Strategy):
     
-    # Stative variables
-    time_periods = [
-            '1W',
-            '1M',
-            '3M',
-            '6M',
-            '1Y',
-            '5Y',
-        ]
-    
+    # Static variables
     name = "Price Threshold"
     
     def __init__(self, ticker: str, capital: float, time_period: str, buy_price: int = None, sell_price: int = None):

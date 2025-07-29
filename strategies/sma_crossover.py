@@ -8,15 +8,6 @@ import mplfinance as mpf
 class SMACrossover(Strategy):
     
     # Static variable
-    time_periods = [
-            '1M',
-            '3M',
-            '6M',
-            '1Y',
-            '3Y',
-            '5Y',
-        ]
-    
     name = 'SMA Crossover'
     
     def __init__(self, ticker: str, capital: float, time_period: str, short_sma: float = None, long_sma: float = None):

@@ -50,8 +50,8 @@ if __name__ == "__main__":
     
     # Apple
     sma_ticker = 'AAPL'
-    sma_short = 50
-    sma_long = 100
+    sma_short = 10
+    sma_long = 50
     
     #PriceThreshold(ticker, buy_price=buy, sell_price=sell, capital=1000, time_period='5Y')    
     #RSIThreshold(rsi_ticker, buy_threshold=rsi_buy, sell_threshold=rsi_sell, capital=1000, time_period='5Y')

@@ -35,7 +35,7 @@ class CLI:
             
     # Get the time period that the back testing will take place in
     def get_time_period(self) -> str: 
-        time_periods = strategies[self.strategy_index].time_periods
+        time_periods = ['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y']
         
         print()
         for i, period in enumerate(time_periods):

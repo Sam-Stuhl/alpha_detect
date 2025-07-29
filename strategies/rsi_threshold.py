@@ -8,15 +8,6 @@ import mplfinance as mpf
 class RSIThreshold(Strategy):
     
     # Static variables
-    time_periods = [
-            '1W',
-            '1M',
-            '3M',
-            '6M',
-            '1Y',
-            '5Y',
-        ]
-    
     name = "RSI Threshold"
     
     def __init__(self, ticker: str, capital: float, time_period: str, buy_threshold: float = None, sell_threshold: float = None):

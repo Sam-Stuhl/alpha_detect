@@ -10,8 +10,8 @@ class SMACrossover(Strategy):
     # Static variable
     name = 'SMA Crossover'
     
-    def __init__(self, ticker: str, capital: float, time_period: str, short_sma: float = None, long_sma: float = None):
-        super().__init__("SMA Crossover", ticker, capital, time_period)
+    def __init__(self, ticker: str, capital: float, time_period: str, time_interval: str, short_sma: float = None, long_sma: float = None):
+        super().__init__("SMA Crossover", ticker, capital, time_period, time_interval)
         
         self.short_sma, self.long_sma = self.get_sma() if not(short_sma and long_sma) else (short_sma, long_sma)
         

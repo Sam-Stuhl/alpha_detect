@@ -4,15 +4,15 @@ import numpy as np
 from datetime import datetime
 
 class Strategy:
-    def __init__(self, type: str, ticker: str, capital: float, time_period: str):    
+    def __init__(self, type: str, ticker: str, capital: float, time_period: str, time_interval: str):    
         self.type = type
         self.ticker = ticker
         self.capital = capital
             
-        self.ticker_data_df = self.get_ticker_data(time_period)
+        self.ticker_data_df = self.get_ticker_data(time_period, time_interval)
     
-    def get_ticker_data(self, time_period) -> pd.DataFrame:
-        ticker_data = yf.download(self.ticker, period=time_period) # Download ticker data
+    def get_ticker_data(self, time_period, time_interval) -> pd.DataFrame:
+        ticker_data = yf.download(self.ticker, period=time_period, interval=time_interval) # Download ticker data
         ticker_data.columns = ticker_data.columns.droplevel(1) # Remove unnecessary ticker column label
         ticker_data.reset_index(inplace=True) # Reset the index
         ticker_data.rename(columns={'Datetime': 'Date'}, inplace=True)

@@ -10,8 +10,8 @@ class RSIThreshold(Strategy):
     # Static variables
     name = "RSI Threshold"
     
-    def __init__(self, ticker: str, capital: float, time_period: str, buy_threshold: float = None, sell_threshold: float = None):
-        super().__init__("RSI Threshold", ticker, capital, time_period)
+    def __init__(self, ticker: str, capital: float, time_period: str, time_interval: str, buy_threshold: float = None, sell_threshold: float = None):
+        super().__init__("RSI Threshold", ticker, capital, time_period, time_interval)
         
         self.buy_threshold, self.sell_threshold = self.get_buy_and_sell_thresholds() if not(buy_threshold and sell_threshold) else (buy_threshold, sell_threshold)
         

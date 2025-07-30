@@ -53,6 +53,6 @@ if __name__ == "__main__":
     sma_short = 10
     sma_long = 50
     
-    #PriceThreshold(ticker, buy_price=buy, sell_price=sell, capital=1000, time_period='5Y')    
-    #RSIThreshold(rsi_ticker, buy_threshold=rsi_buy, sell_threshold=rsi_sell, capital=1000, time_period='5Y')
-    SMACrossover(sma_ticker, 1000, '5Y', sma_short, sma_long)
+    #PriceThreshold(ticker, buy_price=buy, sell_price=sell, capital=1000, time_period='5Y', time_interval='1d')    
+    #RSIThreshold(rsi_ticker, buy_threshold=rsi_buy, sell_threshold=rsi_sell, capital=1000, time_period='5Y', time_interval='1d')
+    SMACrossover(sma_ticker, 1000, '5Y', '1d', sma_short, sma_long)

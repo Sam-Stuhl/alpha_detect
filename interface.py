@@ -3,14 +3,15 @@ from strategies import strategies
 import yfinance as yf
 
 class CLI:
-    def __init__(self, ticker: str = None, capital: float = None, time_period: str = None):
+    def __init__(self, ticker: str = None, capital: float = None, time_period: str = None, time_interval: str = None):
         self.strategy_index = self.get_strategy()
         self.ticker = self.get_ticker() if not ticker else ticker
         self.starting_capital = self.get_capital() if not capital else capital
         self.time_period = self.get_time_period() if not time_period else time_period
+        self.time_interval = self.get_time_interval() if not time_interval else time_interval
         
         # Initialize Strategy   
-        strategies[self.strategy_index](self.ticker, self.starting_capital, self.time_period)
+        strategies[self.strategy_index](self.ticker, self.starting_capital, self.time_period, self.time_interval)
     
     def get_strategy(self) -> int:
         for i, strategy in enumerate(strategies):
@@ -42,6 +43,15 @@ class CLI:
             print(f'({i+1}) {period}')
             
         return time_periods[int(input('Choose a time period to backtest: ')) - 1]
+    
+    def get_time_interval(self) -> str:
+        time_intervals = ['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '4h', '1d', '5d', '1wk', '1mo', '3mo']
+        
+        print()
+        for i, interval in enumerate(time_intervals):
+            print(f'({i + 1}) {interval}')
+            
+        return time_intervals[int(input('Choose a time interval for candles: ')) - 1]
      
     def is_valid_ticker(self, ticker: str) -> bool:
         try:

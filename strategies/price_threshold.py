@@ -11,8 +11,8 @@ class PriceThreshold(Strategy):
     # Static variables
     name = "Price Threshold"
     
-    def __init__(self, ticker: str, capital: float, time_period: str, buy_price: int = None, sell_price: int = None):
-        super().__init__("Price Threshold", ticker, capital, time_period)
+    def __init__(self, ticker: str, capital: float, time_period: str, time_interval: str, buy_price: int = None, sell_price: int = None):
+        super().__init__("Price Threshold", ticker, capital, time_period, time_interval)
             
         self.buy_threshold, self.sell_threshold = self.get_buy_and_sell_thresholds() if not(buy_price and sell_price) else (buy_price, sell_price)
             
